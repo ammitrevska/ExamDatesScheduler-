@@ -1,16 +1,13 @@
 # lab3
 
-A new Flutter project.
+Login Page
 
-## Getting Started
+![image](https://github.com/ammitrevska/Mis_lab3/assets/94235179/0fc27c63-1482-4f18-b9e1-54e4f87691d7)
 
-This project is a starting point for a Flutter application.
+Register page
 
-A few resources to get you started if this is your first Flutter project:
+![image](https://github.com/ammitrevska/Mis_lab3/assets/94235179/168c5990-9d4d-4452-92a8-661922c405ec)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Home page
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![image](https://github.com/ammitrevska/Mis_lab3/assets/94235179/0d63ac90-4c67-48d3-b8a7-5f95abae3c68)
