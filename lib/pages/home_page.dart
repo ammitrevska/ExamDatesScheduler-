@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:lab3/pages/calendar_page.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,6 +15,7 @@ class _HomePageState extends State<HomePage> {
   final user = FirebaseAuth.instance.currentUser!;
 
   final _exams = <Map<String, dynamic>>[];
+  final _events = <DateTime, List<Map<String, dynamic>>>{};
 
   void addAnExam() {
     showDialog(
@@ -89,6 +92,12 @@ class _HomePageState extends State<HomePage> {
                         'date': selectedDate,
                         'time': selectedTime,
                       });
+
+                      _events[selectedDate] ??= [];
+                      _events[selectedDate]!.add({
+                        'name': newExam,
+                        'time': selectedTime,
+                      });
                     }
                     Navigator.pop(context);
                   },
@@ -99,6 +108,17 @@ class _HomePageState extends State<HomePage> {
           ],
         );
       },
+    );
+  }
+
+  void openCalendar() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CalendarPage(
+          events: _events,
+        ),
+      ),
     );
   }
 
@@ -124,6 +144,17 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               addAnExam();
             },
+          ),
+
+          //calendar button
+          IconButton(
+            onPressed: () {
+              openCalendar();
+            },
+            icon: Icon(
+              Icons.calendar_month_rounded,
+              color: Colors.indigo[800],
+            ),
           ),
 
           //logout button
@@ -157,6 +188,9 @@ class _HomePageState extends State<HomePage> {
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
+                    ),
+                    const SizedBox(
+                      height: 10,
                     ),
                     Text(
                       'Date: ${DateFormat('yyyy-MM-dd').format(_exams[index]['date'])}',
