@@ -1,9 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:lab3/exam.dart';
 import 'package:lab3/pages/calendar_page.dart';
-
-import '../utils.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,7 +14,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final user = FirebaseAuth.instance.currentUser!;
 
-  final _exams = <Map<String, dynamic>>[];
+  final List<Exam> _exams = [];
 
   void addAnExam() {
     showDialog(
@@ -36,9 +35,11 @@ class _HomePageState extends State<HomePage> {
                   },
                   decoration: const InputDecoration(labelText: 'Subject Name'),
                 ),
+
                 const SizedBox(
                   height: 10,
                 ),
+
                 Row(
                   children: [
                     ElevatedButton(
@@ -56,10 +57,12 @@ class _HomePageState extends State<HomePage> {
                       },
                       child: const Text('Pick Date'),
                     ),
+
                     const SizedBox(
                       width: 15,
                       height: 15,
                     ),
+
                     ElevatedButton(
                       onPressed: () async {
                         TimeOfDay? pickedTime = await showTimePicker(
@@ -87,11 +90,16 @@ class _HomePageState extends State<HomePage> {
                 setState(
                   () {
                     if (newExam.isNotEmpty) {
-                      _exams.add({
-                        'name': newExam,
-                        'date': selectedDate,
-                        'time': selectedTime,
-                      });
+                      _exams.add(Exam(
+                        name: newExam,
+                        date: DateTime(
+                          selectedDate.year,
+                          selectedDate.month,
+                          selectedDate.day,
+                          selectedTime.hour,
+                          selectedTime.minute,
+                        ),
+                      ));
                     }
                     Navigator.pop(context);
                   },
@@ -105,28 +113,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-void openCalendar() {
-  Map<DateTime, List<Event>> convertedEvents = {};
-
-  for (var exam in _exams) {
-    DateTime date = exam['date'];
-
-    convertedEvents[date] ??= [];
-
-    convertedEvents[date]!.add(Event(exam['name']));
-  }
-
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => CalendarPage(
-        events: convertedEvents,
+  void _openCalendar() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CalendarWidget(exams: _exams),
       ),
-    ),
-  );
-}
-
-
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,6 +135,7 @@ void openCalendar() {
           ),
         ),
         actions: [
+
           //Add button
           IconButton(
             icon: Icon(
@@ -155,8 +150,8 @@ void openCalendar() {
          // Calendar button
           IconButton(
             onPressed: () {
-              openCalendar();
-            },
+                _openCalendar();            
+              },
             icon: Icon(
               Icons.calendar_month_rounded,
               color: Colors.indigo[800],
@@ -175,6 +170,7 @@ void openCalendar() {
           ),
         ],
       ),
+
       body: GridView.count(
         crossAxisCount: 2,
         padding: const EdgeInsets.all(20),
@@ -190,17 +186,17 @@ void openCalendar() {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _exams[index]['name'],
+                      _exams[index].name,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      'Date: ${DateFormat('yyyy-MM-dd').format(_exams[index]['date'])}',
+                      'Date: ${DateFormat('yyyy-MM-dd').format(_exams[index].date)}',
                       style: const TextStyle(color: Colors.grey),
                     ),
                     Text(
-                      'Time: ${_exams[index]['time'].format(context)}',
+                      'Time: ${DateFormat.Hm().format(_exams[index].date)}',
                       style: const TextStyle(color: Colors.grey),
                     ),
                   ],
