@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:lab3/exam.dart';
+import 'package:lab3/models/exam.dart';
 import 'package:lab3/pages/calendar_page.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:lab3/widgets/map_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,7 +18,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<Exam> _exams = [];
 
-@override
+  @override
   void initState() {
     super.initState();
     AwesomeNotifications().initialize(
@@ -36,139 +37,145 @@ class _HomePageState extends State<HomePage> {
     _scheduleNotificationsForExistingExams();
   }
 
-
- void _scheduleNotificationsForExistingExams() {
+  void _scheduleNotificationsForExistingExams() {
     for (int i = 0; i < _exams.length; i++) {
       _scheduleExamNotification(_exams[i]);
     }
   }
 
+  void _scheduleExamNotification(Exam exam) {
+    print("Scheduling notifications for existing exams");
 
-void _scheduleExamNotification(Exam exam) {
-  print("Scheduling notifications for existing exams");
-
-  AwesomeNotifications().createNotification(
-    content: NotificationContent(
-      id: _exams.indexOf(exam),
-      channelKey: "exam_channel",
-      title: "Upcoming Exam",
-      body: "${exam.name} on ${DateFormat('yyyy-MM-dd').format(exam.date)}",
-    ),
-    // schedule: NotificationCalendar(
-    //   day: exam.date.subtract(const Duration(days: 1)).day,
-    //   month: exam.date.subtract(const Duration(days: 1)).month,
-    //   year: exam.date.subtract(const Duration(days: 1)).year,
-    //   hour: exam.date.subtract(const Duration(days: 1)).hour,
-    //   minute: exam.date.subtract(const Duration(days: 1)).minute,
-    //   second: 0,
-    //   millisecond: 0,
-    //   timeZone: "UTC", // Use local time zone
-    // ),
-  );
-}
-
+    AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: _exams.indexOf(exam),
+        channelKey: "exam_channel",
+        title: "Upcoming Exam",
+        body: "${exam.name} on ${DateFormat('yyyy-MM-dd').format(exam.date)}",
+      ),
+      // schedule: NotificationCalendar(
+      //   day: exam.date.subtract(const Duration(days: 1)).day,
+      //   month: exam.date.subtract(const Duration(days: 1)).month,
+      //   year: exam.date.subtract(const Duration(days: 1)).year,
+      //   hour: exam.date.subtract(const Duration(days: 1)).hour,
+      //   minute: exam.date.subtract(const Duration(days: 1)).minute,
+      //   second: 0,
+      //   millisecond: 0,
+      //   timeZone: "UTC", // Use local time zone
+      // ),
+    );
+  }
 
   void addAnExam() {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      String newExam = ' ';
-      DateTime selectedDate = DateTime.now();
-      TimeOfDay selectedTime = TimeOfDay.now();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String newExam = ' ';
+        DateTime selectedDate = DateTime.now();
+        TimeOfDay selectedTime = TimeOfDay.now();
 
-      return AlertDialog(
-        title: const Text('Add an exam'),
-        content: SingleChildScrollView(
-          child: Column(
-            children: [
-              TextField(
-                onChanged: (value) {
-                  newExam = value;
-                },
-                decoration: const InputDecoration(labelText: 'Subject Name'),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Row(
-                children: [
-                  ElevatedButton(
-                    onPressed: () async {
-                      DateTime? pickedDate = await showDatePicker(
-                        context: context,
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime(2055),
-                      );
-                      if (pickedDate != null && pickedDate != selectedDate) {
-                        setState(() {
-                          selectedDate = pickedDate;
-                        });
-                      }
-                    },
-                    child: const Text('Pick Date'),
-                  ),
-                  const SizedBox(
-                    width: 15,
-                    height: 15,
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      TimeOfDay? pickedTime = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.now(),
-                      );
-                      if (pickedTime != null && pickedTime != selectedTime) {
-                        setState(
-                          () {
-                            selectedTime = pickedTime;
-                          },
+        return AlertDialog(
+          title: const Text('Add an exam'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(
+                  onChanged: (value) {
+                    newExam = value;
+                  },
+                  decoration: const InputDecoration(labelText: 'Subject Name'),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () async {
+                        DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime(2055),
                         );
-                      }
-                    },
-                    child: const Text('Pick Time'),
-                  ),
-                ],
-              )
-            ],
+                        if (pickedDate != null && pickedDate != selectedDate) {
+                          setState(() {
+                            selectedDate = pickedDate;
+                          });
+                        }
+                      },
+                      child: const Text('Pick Date'),
+                    ),
+                    const SizedBox(
+                      width: 15,
+                      height: 15,
+                    ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        TimeOfDay? pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+                        if (pickedTime != null && pickedTime != selectedTime) {
+                          setState(
+                            () {
+                              selectedTime = pickedTime;
+                            },
+                          );
+                        }
+                      },
+                      child: const Text('Pick Time'),
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              setState(
-                () {
-                  if (newExam.isNotEmpty) {
-                    Exam exam = Exam(
-                      name: newExam,
-                      date: DateTime(
-                        selectedDate.year,
-                        selectedDate.month,
-                        selectedDate.day,
-                        selectedTime.hour,
-                        selectedTime.minute,
-                      ),
-                    );
-                    _exams.add(exam);
-                    _scheduleExamNotification(exam); // Schedule notification when the exam is added
-                  }
-                  Navigator.pop(context);
-                },
-              );
-            },
-            child: const Text('Add'),
-          ),
-        ],
-      );
-    },
-  );
-}
-
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                setState(
+                  () {
+                    if (newExam.isNotEmpty) {
+                      Exam exam = Exam(
+                        name: newExam,
+                        date: DateTime(
+                          selectedDate.year,
+                          selectedDate.month,
+                          selectedDate.day,
+                          selectedTime.hour,
+                          selectedTime.minute,
+                        ),
+                      );
+                      _exams.add(exam);
+                      _scheduleExamNotification(
+                          exam); // Schedule notification when the exam is added
+                    }
+                    Navigator.pop(context);
+                  },
+                );
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _openCalendar() {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => CalendarWidget(exams: _exams),
+      ),
+    );
+  }
+
+  void _openMap() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MapWidget(),
       ),
     );
   }
@@ -186,6 +193,7 @@ void _scheduleExamNotification(Exam exam) {
           ),
         ),
         actions: [
+          
           //Add button
           IconButton(
             icon: Icon(
@@ -204,6 +212,17 @@ void _scheduleExamNotification(Exam exam) {
             },
             icon: Icon(
               Icons.calendar_month_rounded,
+              color: Colors.indigo[800],
+            ),
+          ),
+
+          //map button
+          IconButton(
+            onPressed: () {
+              _openMap();
+            },
+            icon: Icon(
+              Icons.travel_explore,
               color: Colors.indigo[800],
             ),
           ),
