@@ -1,4 +1,4 @@
-# lab3
+# Exam Dates Scheduler
 
 Login Page
 
